@@ -83,3 +83,10 @@ node --test internal/gui/tests/library-items.test.cjs internal/gui/tests/library
 
 The package's `TestMain` runs in a home of its own (`testenv`), never the
 user's real agent files.
+
+## Magiko fork
+
+Builds with `-tags magiko` add the [Magiko workspace and identity](../magiko/architecture.md).
+Normal builds preserve the upstream behavior. The fork does not automatically
+migrate live agent configuration. See the architecture reference for request
+preferences, explicit Library skill imports, and isolated app/startup paths.

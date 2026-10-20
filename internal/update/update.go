@@ -31,6 +31,7 @@ import (
 	"time"
 
 	"github.com/yetone/magpie/internal/appdir"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/netproxy"
 	"github.com/yetone/magpie/internal/proc"
 	"github.com/yetone/magpie/internal/source"
@@ -81,6 +82,9 @@ func Latest(ctx context.Context) (*Release, error) { return LatestIn(ctx, "") }
 // LatestIn asks the feed for the newest release, its notes in lang (see
 // InLang): the app's language, which What's new follows.
 func LatestIn(ctx context.Context, lang string) (*Release, error) {
+	if brand.Fork {
+		return nil, fmt.Errorf("Magiko updates are manual: https://github.com/NorwayXZ/Magiko/releases")
+	}
 	req, err := http.NewRequestWithContext(ctx, "GET", withLang(Feed(), lang), nil)
 	if err != nil {
 		return nil, err
@@ -108,6 +112,9 @@ func LatestIn(ctx context.Context, lang string) (*Release, error) {
 // source ("dev", "0bcb2cc-dirty", git describe's "v0.1.0-3-g0bcb2cc");
 // only releases update themselves.
 func Released(v string) bool {
+	if brand.Fork {
+		return false
+	}
 	s := parse(v)
 	return s != nil && !describe.MatchString(s.pre) && !strings.Contains(s.pre, "dirty")
 }

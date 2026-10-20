@@ -15,6 +15,7 @@ import (
 
 	"github.com/yetone/magpie/internal/agent"
 	"github.com/yetone/magpie/internal/appdir"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/catalog"
 	"github.com/yetone/magpie/internal/claudebridge"
 	"github.com/yetone/magpie/internal/davsync"
@@ -165,7 +166,7 @@ func Main(v string) {
 		if len(os.Args) > 1 {
 			switch os.Args[1] {
 			case "-v", "--version", "version":
-				fmt.Println("magpie", version)
+				fmt.Println(brand.Name, version)
 				return
 			case "-h", "--help", "help":
 				fmt.Print(usage)
@@ -340,7 +341,7 @@ func run(args []string) error {
 		fmt.Print(usage)
 		return nil
 	case "-v", "--version", "version":
-		fmt.Println("magpie", version)
+		fmt.Println(brand.Name, version)
 		return nil
 	case "ls", "list":
 		// in the order the app lists them; those hidden there come last, dimmed

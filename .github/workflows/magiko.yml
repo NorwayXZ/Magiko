@@ -1,0 +1,39 @@
+name: Magiko
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Fork integration contracts
+        run: go test -tags 'nogui magiko' ./internal/magiko ./internal/brand ./internal/gui ./internal/gateway ./internal/update -run 'TestMagiko|TestPreferences|TestPreferenceStorage|TestSkillPack|TestCoreScriptBudget' -count=1
+      - name: Static checks
+        run: go vet -tags 'nogui magiko' ./...
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: UI dependencies
+        run: |
+          npm install --prefix "$RUNNER_TEMP/magiko-ui" --no-audit --no-fund playwright@1.64.1
+          "$RUNNER_TEMP/magiko-ui/node_modules/.bin/playwright" install chromium webkit
+      - name: Browser contracts
+        run: NODE_PATH="$RUNNER_TEMP/magiko-ui/node_modules" node --test internal/gui/tests/magiko.test.cjs
+      - name: Native ARM64 app
+        run: build/magiko/build.sh
+      - name: Embedded app smoke test (isolated HOME)
+        run: python3 build/magiko/smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Magiko-mac-arm64
+          path: |
+            dist/*.zip
+            dist/*.sha256

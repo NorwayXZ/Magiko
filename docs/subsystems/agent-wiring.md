@@ -169,3 +169,10 @@ reader: `Agent.Added` remains nil and the JSON row omits `added`. The GUI
 shows a confirmation hint for this unknown state; Cindy still reports its
 known true/false status. Reopening the link lets Lody handle duplicates.
 Bub requires its separately installed ACP plugin.
+
+## Magiko fork
+
+Builds with `-tags magiko` add the [Magiko workspace and identity](../magiko/architecture.md).
+Normal builds preserve the upstream behavior. The fork does not automatically
+migrate live agent configuration. See the architecture reference for request
+preferences, explicit Library skill imports, and isolated app/startup paths.

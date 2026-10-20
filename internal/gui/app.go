@@ -22,6 +22,7 @@ import (
 	"github.com/yetone/magpie/internal/agent"
 	"github.com/yetone/magpie/internal/appdir"
 	"github.com/yetone/magpie/internal/autostart"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/library"
 	"github.com/yetone/magpie/internal/omarchy"
 	"github.com/yetone/magpie/internal/proc"
@@ -55,7 +56,14 @@ var appIconLarge []byte
 // bundle has AppIcon.icon compiled in (Assets.car), whose Dock then draws
 // it light or dark as macOS 26 has it, where a picture set at run time
 // stays light, a white tile in a dark Dock (#117).
+//
+//go:embed magiko-icon-1024.png
+var magikoIconLarge []byte
+
 func appIconFor() []byte {
+	if brand.Fork {
+		return magikoIconLarge
+	}
 	if runtime.GOOS == "darwin" {
 		if exe, err := os.Executable(); err == nil {
 			if _, err := os.Stat(filepath.Join(filepath.Dir(exe), "..", "Resources", "Assets.car")); err == nil {
@@ -180,7 +188,7 @@ func (h *host) ChooseFolder(title string) (string, error) {
 
 // panelTitle names the panel for Hyprland's rule, which places it, and
 // for niri, which finds it by it (the main window is "magpie")
-const panelTitle = "magpie panel"
+const panelTitle = brand.Name + " panel"
 
 // FitPanel grows or shrinks the panel to its content and keeps it anchored
 // under the tray icon; a shown panel glides there when g says how. height
@@ -353,7 +361,7 @@ func Run(version string, showMain bool, link string) error {
 		// second launch); it hands its arguments to the running one and quits.
 		// The Mac sends the link to the running app itself.
 		SingleInstance: singleInstance(h),
-		Name:           "magpie",
+		Name:           brand.Name,
 		Description:    "one place to pick every agent's model",
 		Icon:           appIconFor(),
 		Assets:         application.AssetOptions{Handler: ownWindow(handler)},
@@ -603,7 +611,7 @@ func singleInstance(h *host) *application.SingleInstanceOptions {
 	}
 	sum := sha256.Sum256([]byte(settings.Dir()))
 	return &application.SingleInstanceOptions{
-		UniqueID: "ai.usemagpie.app.i" + hex.EncodeToString(sum[:6]),
+		UniqueID: brand.InstanceID + hex.EncodeToString(sum[:6]),
 		OnSecondInstanceLaunch: func(d application.SecondInstanceData) {
 			args := d.Args
 			if len(args) > 0 {
@@ -672,7 +680,7 @@ func (h *host) setBird(b []byte) {
 func panelOptions(goos, theme string) application.WebviewWindowOptions {
 	o := application.WebviewWindowOptions{
 		Name:            "panel",
-		Title:           "magpie",
+		Title:           brand.Name,
 		URL:             "/?mode=panel" + theme,
 		Width:           panelWidth,
 		Height:          520,

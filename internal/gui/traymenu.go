@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/gateway"
 )
 
@@ -109,6 +110,9 @@ func notesLang(lang string) string {
 func trayText(lang, key string, args ...any) string {
 	if s, ok := trayWords[lang][key]; ok {
 		key = s
+	}
+	if brand.Fork {
+		key = strings.ReplaceAll(key, "magpie", brand.Name)
 	}
 	if len(args) == 0 {
 		return key

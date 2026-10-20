@@ -111,3 +111,10 @@ go test -race -tags nogui ./internal/plugin ./internal/gateway -run '^TestGatewa
 Service deployment, automatic installation and gateway-owned tool loops are
 outside this contract. A concrete companion integration is PowerContext recall
 via `/v1/context/prepare` and conversation capture via `/v1/sources/content`.
+
+## Magiko fork
+
+Builds with `-tags magiko` add the [Magiko workspace and identity](../magiko/architecture.md).
+Normal builds preserve the upstream behavior. The fork does not automatically
+migrate live agent configuration. See the architecture reference for request
+preferences, explicit Library skill imports, and isolated app/startup paths.

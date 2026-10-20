@@ -6,7 +6,9 @@ import (
 	"slices"
 
 	"github.com/yetone/magpie/internal/access"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/gwmw"
+	"github.com/yetone/magpie/internal/magiko"
 	"github.com/yetone/magpie/internal/middleware"
 	"github.com/yetone/magpie/internal/plugin"
 	"github.com/yetone/magpie/internal/provider"
@@ -85,6 +87,11 @@ func middlewareWanted() bool { return middleware.On() > 0 }
 // whole. Its writer wraps the middleware's, so what they see is what the
 // agent was given. With no hook it is the request as it came.
 func gatewayHooks(w http.ResponseWriter, r *http.Request, from provider.Protocol, body []byte) (http.ResponseWriter, []byte, func()) {
+	if brand.Fork && gatewayOrigin(r) == "local" {
+		if prefs, err := magiko.Load(); err == nil {
+			body = magiko.Apply(string(from), body, prefs)
+		}
+	}
 	if !plugin.HasGateway() {
 		return w, body, func() {}
 	}

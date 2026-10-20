@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/yetone/magpie/internal/brand"
 )
 
 // launchd runs the service as a launch agent of the user's: started at
@@ -13,7 +15,7 @@ import (
 type launchd struct{}
 
 // Label is the launch agent's; the tray's at login is com.yetone.magpie.
-const Label = "com.yetone.magpie.serve"
+const Label = brand.BundleID + ".serve"
 
 func home() string {
 	h, _ := os.UserHomeDir()

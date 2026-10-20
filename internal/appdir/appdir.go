@@ -42,6 +42,8 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/yetone/magpie/internal/brand"
 )
 
 const (
@@ -176,13 +178,13 @@ var sharedFolder = func(dir string) bool {
 // with no home folder.
 func installed() string {
 	if x := os.Getenv("XDG_CONFIG_HOME"); rooted(x) {
-		return filepath.Join(x, "magpie")
+		return filepath.Join(x, brand.Slug)
 	}
 	h, err := Home()
 	if err != nil {
 		return ""
 	}
-	return filepath.Join(h, ".config", "magpie")
+	return filepath.Join(h, ".config", brand.Slug)
 }
 
 // Beside is the folder a portable magpie run from exe keeps its data folder
@@ -228,9 +230,9 @@ func Config() string {
 		return p
 	}
 	if x := os.Getenv("XDG_CONFIG_HOME"); rooted(x) {
-		return filepath.Join(x, "magpie")
+		return filepath.Join(x, brand.Slug)
 	}
-	return filepath.Join(mustHome(), ".config", "magpie")
+	return filepath.Join(mustHome(), ".config", brand.Slug)
 }
 
 // Redirected is the folder magpie keeps its files in when it is opened
@@ -247,7 +249,7 @@ func Redirected() string {
 	if err != nil {
 		return ""
 	}
-	if def := filepath.Join(h, ".config", "magpie"); filepath.Clean(def) != filepath.Clean(Config()) {
+	if def := filepath.Join(h, ".config", brand.Slug); filepath.Clean(def) != filepath.Clean(Config()) {
 		return def
 	}
 	return ""
@@ -260,9 +262,9 @@ func Cache() string {
 		return filepath.Join(p, "cache")
 	}
 	if x := os.Getenv("XDG_CACHE_HOME"); rooted(x) {
-		return filepath.Join(x, "magpie")
+		return filepath.Join(x, brand.Slug)
 	}
-	return filepath.Join(mustHome(), ".cache", "magpie")
+	return filepath.Join(mustHome(), ".cache", brand.Slug)
 }
 
 // WebView is the folder the Windows webview (WebView2) keeps its profile
@@ -288,5 +290,5 @@ func SystemCache() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, "magpie"), nil
+	return filepath.Join(d, brand.Slug), nil
 }

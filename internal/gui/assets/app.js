@@ -7610,7 +7610,7 @@ async function cancelEdit(keep) {
   return true;
 }
 window.addEventListener("beforeunload", (e) => {
-  if (providerDirty() || magpie.call("routing", "dirty") || ((view === "library" || importing || importingApps) && modalFormDirty())) {
+  if (providerDirty() || ["routing", "magiko"].some(p => magpie.call(p, "dirty")) || ((view === "library" || importing || importingApps) && modalFormDirty())) {
     e.preventDefault();
     e.returnValue = "";
   }
@@ -22784,13 +22784,9 @@ async function show(v) {
       if (view === "library" && modalFormDirty() && !(await confirmDiscard())) return false;
       if (view === "library") magpie.call("library", "close"); else closeModal();
     }
-    if (view === "routing" && magpie.call("routing", "dirty")) {
+    if (["routing", "library", "magiko"].includes(view) && magpie.call(view, "dirty")) {
       if (!(await confirmDiscard())) return false;
-      magpie.call("routing", "discard");
-    }
-    if (view === "library" && magpie.call("library", "dirty")) {
-      if (!(await confirmDiscard())) return false;
-      magpie.call("library", "discard");
+      magpie.call(view, "discard");
     }
     // the page left lets go of what was only for this visit (the Usage
     // page's Requests, what a click filtered them by)

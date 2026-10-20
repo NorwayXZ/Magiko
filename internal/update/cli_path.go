@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/proc"
 )
 
@@ -211,7 +212,7 @@ func cliNames() []string {
 	if runtime.GOOS == "windows" {
 		return []string{"magpie.exe", "magpie.cmd", "magpie.bat"}
 	}
-	return []string{"magpie"}
+	return []string{brand.Slug}
 }
 
 // findCLI is the magpie a shell with PATH dirs runs, "" none.

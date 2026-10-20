@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/yetone/magpie/internal/appdir"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/catalog"
 	"github.com/yetone/magpie/internal/edit"
 	"github.com/yetone/magpie/internal/filememo"
@@ -1154,7 +1155,7 @@ func CheckProxy(p string) error {
 
 // DefaultPort is the gateway's port unless Settings or MAGPIE_ADDR say
 // another.
-const DefaultPort = 3425
+const DefaultPort = brand.Port
 
 // CheckPort says what is wrong with a port for the gateway: one from 1024
 // to 65535 (below that a system wants an administrator to listen on it),

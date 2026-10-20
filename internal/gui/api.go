@@ -32,6 +32,7 @@ import (
 	"github.com/yetone/magpie/internal/access"
 	"github.com/yetone/magpie/internal/agent"
 	"github.com/yetone/magpie/internal/autostart"
+	"github.com/yetone/magpie/internal/brand"
 	"github.com/yetone/magpie/internal/catalog"
 	"github.com/yetone/magpie/internal/filememo"
 	"github.com/yetone/magpie/internal/fonts"
@@ -780,6 +781,13 @@ var pageFile = regexp.MustCompile(`(src|href)="([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-
 // named with its content's hash; one not among the page's files (boot.js,
 // which the API writes) keeps its name.
 func versionedPage(page []byte) []byte {
+	if !brand.Fork {
+		page = bytes.ReplaceAll(page, []byte(`<script src="plugins/magiko/client.js"></script>`), nil)
+	}
+	if brand.Fork {
+		page = bytes.ReplaceAll(page, []byte("<title>magpie</title>"), []byte("<title>Magiko</title>"))
+		page = bytes.ReplaceAll(page, []byte("<span>magpie</span>"), []byte("<span>Magiko</span>"))
+	}
 	return pageFile.ReplaceAllFunc(page, func(m []byte) []byte {
 		g := pageFile.FindSubmatch(m)
 		b, err := fs.ReadFile(staticFS(), string(g[2]))
@@ -803,6 +811,7 @@ func Handler(w Windows, gw *gateway.Server) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/", devPage(revalidated(http.FileServer(http.FS(staticFS())))))
+	magikoRoutes(mux)
 	devRoutes(mux)
 	pluginPageRoutes(mux)
 	// boot.js hands the page the saved language and theme before it paints:
@@ -812,6 +821,9 @@ func Handler(w Windows, gw *gateway.Server) http.Handler {
 		// and the text size, which the Mac's header measures against the
 		// traffic lights
 		boot := map[string]any{"lang": s.Lang, "theme": s.Theme, "textSize": s.TextSize, "web": isWeb(w)}
+		if brand.Fork {
+			boot["magiko"] = true
+		}
 		if s.Colorblind {
 			boot["colorblind"] = true
 		}
